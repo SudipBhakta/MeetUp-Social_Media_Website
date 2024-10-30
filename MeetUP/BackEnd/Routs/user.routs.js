@@ -20,7 +20,7 @@ userRouter.route("/:id/profile").get(isAuthanticat, getProfile);
 userRouter
   .route("/profile/edit")
   .post(isAuthanticat, upload.single("avatar"), editProfile);
-userRouter.route("/suggestedUser").get(isAuthanticat, suggestedUsers);
+userRouter.route("/suggestedUsers").get(isAuthanticat, suggestedUsers);
 userRouter.route("/followAndUnfollow/:id").post(isAuthanticat, followAndUnllow);
 
 export default userRouter;

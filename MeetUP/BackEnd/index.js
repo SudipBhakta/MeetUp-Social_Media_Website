@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import connectDB from "./Utils/db.js";
 import userRouter from "./Routs/user.routs.js";
+import postRouter from "./Routs/post.routs.js";
 
 dotenv.config();
 const app = express();
@@ -32,6 +33,7 @@ app.use(cors(corsOptions));
 
 //Routes
 app.use("/api/v1/user", userRouter)
+app.use("/api/v1/post",postRouter)
 
 //PORT Assigned
 app.listen(PORT, async() => {
