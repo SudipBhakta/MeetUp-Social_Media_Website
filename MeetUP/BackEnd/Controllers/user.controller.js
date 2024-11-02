@@ -3,6 +3,7 @@ import User from "../Models/user.model.js";
 import bcrypt from "bcryptjs";
 import getDataUri from "../Utils/dataUri.js";
 import cloudinary from "../Utils/cloudinary.js";
+import Post from "../Models/post.model.js";
 
 //Registration Logic
 export const register = async (req, res) => {
@@ -15,10 +16,17 @@ export const register = async (req, res) => {
       });
     }
     // Check for existing user
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
       return res.status(401).json({
         message: "Email id already exist, try different email id",
+        success: false,
+      });
+    }
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(401).json({
+        message: "User Name already exist, try different email id",
         success: false,
       });
     }
@@ -65,7 +73,21 @@ export const login = async (req, res) => {
         success: false,
       });
     }
+    //genrate jwt token
+    const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
+      expiresIn: "1d",
+    });
 
+    //get all posts of user
+    const userPosts = await Promise.all(
+      user.posts.map(async (postId) => {
+        const post = await Post.findById(postId);
+        if (post.author.equals(user._id)) {
+          return post;
+        }
+        return null;
+      })
+    );
     //update user
     user = {
       _id: user._id,
@@ -75,22 +97,18 @@ export const login = async (req, res) => {
       bio: user.bio,
       followers: user.followers,
       following: user.following,
-      posts: user.posts,
+      posts: userPosts,
     };
 
-    //genrate jwt token
-    const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
-      expiresIn: "1d",
-    });
-    console.log(token)
+    console.log(token);
     return res
       .cookie("token", token, {
         httpOnly: true,
         sameSite: "strict",
         maxAge: 1 * 24 * 60 * 60 * 1000,
-      }).status(200)
+      })
       .json({
-        message: `welcome ${user.username} `,
+        message: `Welcome back ${user.username}`,
         success: true,
         user,
       });
@@ -104,7 +122,7 @@ export const logout = (req, res) => {
   try {
     res.cookie("token", "", { maxAge: 0 }).json({
       message: "Logout Successfull",
-      sucess: true,
+      success: true,
     });
   } catch (error) {
     console.log("Logout Error:", error);
@@ -155,7 +173,7 @@ export const editProfile = async (req, res) => {
     return res.json({
       message: "Profile edited successfully",
       success: true,
-      user
+      user,
     });
   } catch (error) {
     console.log("Edit Profile Error:", error);
@@ -163,10 +181,9 @@ export const editProfile = async (req, res) => {
 };
 
 //Suggested User logic
-
 export const suggestedUsers = async (req, res) => {
   try {
-    const user = await User.find({_id:{ $ne: req.id }}).select("-password");
+    const user = await User.find({ _id: { $ne: req.id } }).select("-password");
     if (!user) {
       return res.status(404).json({
         message: "No Suggested User Found",
@@ -175,7 +192,7 @@ export const suggestedUsers = async (req, res) => {
     }
     return res.status(200).json({
       success: true,
-      user
+      user,
     });
   } catch (error) {
     console.log("SuggestedUser Error:", error);
@@ -195,12 +212,12 @@ export const followAndUnllow = async (req, res) => {
       });
     }
     // check if already following or not
-    if (followBy.following.includes(followTo._id)) {
+    if (followBy.followings.includes(followTo._id)) {
       //unfollow ligic
       await Promise.all([
         User.updateOne(
           { _id: followBy._id },
-          { $pull: { following: followTo._id } }
+          { $pull: { followings: followTo._id } }
         ),
         User.updateOne(
           { _id: followTo._id },
@@ -211,12 +228,12 @@ export const followAndUnllow = async (req, res) => {
         message: "Unfollowed Successfully",
         success: true,
       });
-    }else{
+    } else {
       // follow logic
       await Promise.all([
         User.updateOne(
           { _id: followBy._id },
-          { $push: { following: followTo._id } }
+          { $push: { followings: followTo._id } }
         ),
         User.updateOne(
           { _id: followTo._id },

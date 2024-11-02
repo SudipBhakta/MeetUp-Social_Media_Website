@@ -5,12 +5,12 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
-      // unique: true,
+      unique:true
     },
     email: {
       type: String,
       required: true,
-      unique: true,
+      unique: true, // Ensure email is unique
     },
     password: {
       type: String,
@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    following: [
+    followings: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema(
         ref: "Post",
       },
     ],
-    savedpost: [
+    savedposts: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Post",

@@ -20,4 +20,5 @@ const massegeSchema = new mongoose.Schema(
   }
 );
 
-export default Massege = mongoose.model("Massege", massegeSchema);
+const Massege = mongoose.model("Massege", massegeSchema);
+export default Massege;

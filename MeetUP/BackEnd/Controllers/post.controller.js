@@ -146,6 +146,18 @@ export const editPost = async (req, res) => {
     const postId = req.params.id;
     const { caption } = req.body;
     const image = req.file;
+    const authorId = req.id;
+    let post = await Post.findById(postId);
+    if (!post) {
+      return res
+        .status(404)
+        .json({ message: "Post not found", success: false });
+    }
+    if (post.author.toString() !== authorId) {
+      return res.status(401).json({
+        message: "You are not valid Author",
+      });
+    }
     if (!caption && !image) {
       return res.status(400).json({
         message: "At least an image or caption required to edit",
@@ -163,13 +175,6 @@ export const editPost = async (req, res) => {
         "base64"
       )}`;
       cloudinaryRes = await cloudinary.uploader.upload(imageUri);
-    }
-    // Find the existing post
-    let post = await Post.findById(postId);
-    if (!post) {
-      return res
-        .status(404)
-        .json({ message: "Post not found", success: false });
     }
     // Update post fields
     if (cloudinaryRes) {
@@ -215,7 +220,7 @@ export const deletePost = async (req, res) => {
     // Remove the post from the user post aray
     await User.findByIdAndUpdate(post.author, { $pull: { posts: post._id } });
 
-    // Remove the post from the comments array
+    // Remove the post comments from comment module
     await Comment.deleteMany({ post: post._id });
 
     // Delete the post from the database
@@ -229,5 +234,40 @@ export const deletePost = async (req, res) => {
       message: "An error occurred while deleting the post",
       success: false,
     });
+  }
+};
+
+//Save Posts
+export const savePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    const user = await User.findById(req.id);
+    if (!post) {
+      return res.status(404).json({
+        message: "Post Not Found",
+        success: false,
+      });
+    }
+    //check save post already exist then unsave
+    if (user.savedposts.includes(post._id)) {
+      await user.updateOne({ $pull: { savedposts: post._id } });
+      await user.save();
+      return res.status(200).json({
+        type: "unsave",
+        message: "Post Unsave Successfully",
+        success: true,
+      });
+    } else {
+      //else save the post
+      await user.updateOne({ $push: { savedposts: post._id } });
+      await user.save();
+      return res.status(200).json({
+        type: "save",
+        message: "Post Save Successfully",
+        success: true,
+      });
+    }
+  } catch (error) {
+    console.log("Save Posts Error:", error);
   }
 };
