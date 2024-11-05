@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setAuthUser } from "../redux/authSlice.js";
 
 function SignUpAndLogin() {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,6 +19,7 @@ function SignUpAndLogin() {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   // signup logic
   const signupHandleChange = (e) => {
     setSignUpInput({ ...signupInput, [e.target.name]: e.target.value });
@@ -49,7 +52,7 @@ function SignUpAndLogin() {
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
-      setLoading(false);
+      +setLoading(false);
     }
   };
   // login logic
@@ -71,7 +74,9 @@ function SignUpAndLogin() {
           withCredentials: true,
         }
       );
+      
       if (res.data.success) {
+        dispatch(setAuthUser(res.data.user));
         toast.success(res.data.message);
         setTimeout(() => {
           navigate("/");
@@ -117,9 +122,8 @@ function SignUpAndLogin() {
               />
               <div>
                 {loading ? (
-                  <button className="w-full h-10 bg-blue-500 text-white justify rounded-md">
+                  <button className="w-full h-10 bg-blue-500 text-white justify rounded-md ">
                     <span className="loading loading-spinner text-accent"></span>
-                    Please wait...
                   </button>
                 ) : (
                   <button
@@ -176,11 +180,10 @@ function SignUpAndLogin() {
                 onChange={signupHandleChange}
                 className="w-full mb-4 p-2 border focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-md"
               />
-             <div>
+              <div>
                 {loading ? (
                   <button className="w-full h-10 bg-blue-500 text-white justify rounded-md">
                     <span className="loading loading-spinner text-accent"></span>
-                    Please wait...
                   </button>
                 ) : (
                   <button

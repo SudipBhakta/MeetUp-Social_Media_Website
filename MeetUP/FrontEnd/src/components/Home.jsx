@@ -6,7 +6,7 @@ import RightSidebar from "./RightSidebar";
 const Home = () => {
   return (
     <>
-      <div className="grid grid-cols-[75%_250%] min-h-screen">
+      <div className="grid grid-cols-[75%_25%] max-h-full ">
         <div className="">
           <Feed />
           <Outlet/>

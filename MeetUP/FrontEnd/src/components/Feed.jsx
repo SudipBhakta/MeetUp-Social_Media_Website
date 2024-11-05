@@ -1,42 +1,36 @@
-import React from "react";
-import Post from "./Post";
+import React, { useEffect, useState } from "react";
+import PostCard from "./PostCard";
+import CreatPost from "./CreatPost";
+import { useSelector } from "react-redux";
+import getAllPosts from "../hooks/getAllPosts";
 
 const Feed = () => {
+  getAllPosts()
+  const { user } = useSelector((store) => store.auth);
+  const {posts}= useSelector((store)=>store.posts)
   return (
     <>
-      <div className="flex flex-col items-center mt-8">
-        <div className="flex rounded-md bg-white w-[78%] mb-3 p-3 mr-2">
-          <div className="avatar  ">
-            <div className="w-12  rounded-full">
-              <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+      <div className="flex flex-col items-center ">
+        <div className="flex rounded-md bg-white w-[78%] p-3 mr-2 mb-3 border-2">
+          <div className="avatar">
+            <div className="w-10 h-10 ring-2 ring-blue-700 rounded-full">
+              <img src={user?.avatar} alt="User avatar" />
             </div>
           </div>
-          <div className=" ml-3 w-full">
+          <div className="ml-3 w-full">
             <button
-              className=" h-12 rounded-full  border bg-slate-200 border-blue-300 w-[90%] p-3 text-left"
-              onClick={() => document.getElementById("my_modal_3").showModal()}
+              className="h-12 rounded-full border border-slate-400 hover:bg-blue-50 hover:border-blue-300 w-[90%] p-3 text-left font-semibold text-gray-400 hover:text-blue-600"
+              onClick={() => document.getElementById("my_modal_4").showModal()}
             >
               Create your Post...
             </button>
           </div>
-
-          <dialog id="my_modal_3" className="modal">
-            <div className="modal-box">
-              <form method="dialog">
-                {/* if there is a button in form, it will close the modal */}
-                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-                  ✕
-                </button>
-              </form>
-              <h3 className="font-bold text-lg">Hello!</h3>
-              <p className="py-4">
-                Press ESC key or click on ✕ button to close
-              </p>
-            </div>
-          </dialog>
         </div>
-        <Post />
-        <Post />
+        <CreatPost />
+
+        {posts.map((post) => (
+          <PostCard post={post} key={post._id} />
+        ))}
       </div>
     </>
   );

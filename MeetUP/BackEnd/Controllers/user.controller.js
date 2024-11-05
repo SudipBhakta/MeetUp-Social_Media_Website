@@ -93,10 +93,10 @@ export const login = async (req, res) => {
       _id: user._id,
       username: user.username,
       email: user.email,
-      avtar: user.avtar,
+      avatar: user.avatar,
       bio: user.bio,
       followers: user.followers,
-      following: user.following,
+      following: user.followings,
       posts: userPosts,
     };
 

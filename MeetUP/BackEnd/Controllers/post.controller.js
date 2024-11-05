@@ -12,80 +12,85 @@ export const newPost = async (req, res) => {
     const authorId = req.id;
 
     // Check if at least one of the fields is provided
-    if (!caption && !image) {
+    if (!image) {
       return res.status(400).json({
-        message: "At least an image or caption required",
+        message: "Image is required to create post",
         success: false,
       });
     }
 
-    let cloudinaryRes = null;
-
     // Process the image if it exists
-    if (image) {
       const sharpImage = await Sharp(image.buffer)
         .resize({ width: 800, height: 800, fit: "inside" })
         .toFormat("jpeg", { quality: 75 })
         .toBuffer();
 
       // Convert the image buffer to Data URI format
-      const imageUri = `data:image/jpeg;base64,${sharpImage.toString(
-        "base64"
-      )}`;
+      const imageUri = `data:image/jpeg;base64,${sharpImage.toString("base64")}`;
 
       // Upload to Cloudinary
-      cloudinaryRes = await cloudinary.uploader.upload(imageUri);
-    }
+     const cloudinaryRes = await cloudinary.uploader.upload(imageUri);
 
     // Create a new post
     const post = new Post({
       caption: caption,
       author: authorId,
-      image: cloudinaryRes ? cloudinaryRes.secure_url : "",
+      image: cloudinaryRes.secure_url
     });
+    
+    // Save the post
     await post.save();
 
     // Update the user's posts array
-    const user = await User.findById(post.author);
+    const user = await User.findById(authorId);
     if (user) {
-      await user.posts.push(post._id);
+      user.posts.push(post._id);
       await user.save();
-      await post.populate({ path: "author", select: "-password" });
-      await post.save();
     }
 
-    return res
-      .status(200)
-      .json({ message: "Post created successfully", success: true, post });
+    // Populate the author field on the post with user details
+    const populatedPost = await Post.findById(post._id).populate({
+      path: 'author',
+      select: '-password', // Exclude the password field from the user details
+    });
+
+    return res.status(200).json({ message: "Post created successfully", success: true, post: populatedPost });
   } catch (error) {
     console.error("Post Error:", error);
-    return res
-      .status(500)
-      .json({ message: "Internal Server Error", success: false });
+    return res.status(500).json({ message: "Internal Server Error", success: false });
   }
 };
+
 
 // Get Posts
 export const allPosts = async (req, res) => {
   try {
     const allPost = await Post.find()
       .sort({ createdAt: -1 })
-      .populate({ path: "author", select: "username, avatar" })
-      .populate({ path: "comments", select: "username , avatar" });
-    if (!allPost) {
+      .populate({ path: "author", select: "username avatar" }) // Use space instead of comma
+      .populate({ path: "comments", select: "username avatar" }); // Assuming comments have a similar structure
+    
+    // Check if there are no posts found
+    if (allPost.length === 0) {
       return res.status(404).json({
-        message: "No Post Found",
+        message: "No posts found",
         success: false,
       });
     }
+    
     return res.status(200).json({
       success: true,
       allPost,
     });
   } catch (error) {
-    console.log("Get All Post Error:", error);
+    console.error("Get All Post Error:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
   }
 };
+
 
 // Get user posts
 export const userPosts = async (req, res) => {

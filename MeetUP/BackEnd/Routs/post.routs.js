@@ -18,12 +18,15 @@ import {
 } from "../Controllers/comment.controller.js";
 const postRouter = express.Router();
 //Post Routs
-postRouter.route("/addpost").post(isAuthanticat, upload.single("image"), newPost);
-postRouter.route("/allposts").get(isAuthanticat, allPosts);
+postRouter
+  .route("/addpost")
+  .post(isAuthanticat, upload.single("image"), newPost);
+postRouter.route("/allposts").get(allPosts);
 postRouter.route("/userposts").get(isAuthanticat, userPosts);
-postRouter.route("/:id/editpost").post(isAuthanticat, upload.single("image"), editPost);
-postRouter.route("/:id/likepost").post(isAuthanticat, likeAndUnlike);
-postRouter.route("/:id/unlikepost").post(isAuthanticat, likeAndUnlike);
+postRouter
+  .route("/:id/editpost")
+  .post(isAuthanticat, upload.single("image"), editPost);
+postRouter.route("/:id/likeandunlike").post(isAuthanticat, likeAndUnlike);
 postRouter.route("/:id/deletepost").delete(isAuthanticat, deletePost);
 postRouter.route("/:id/savepost").post(isAuthanticat, savePost);
 // Comments Routs

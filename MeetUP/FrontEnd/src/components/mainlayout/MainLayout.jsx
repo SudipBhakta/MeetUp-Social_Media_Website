@@ -1,18 +1,21 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import LeftSidebar from "../LeftSidebar";
+import Navbar from "../Navbar";
 
 const MainLayout = () => {
   return (
-    <div className="grid grid-cols-[22%_78%] bg-slate-100 min-h-screen ">
-      <div>
-        <LeftSidebar />
+    <>
+    <Navbar/>
+      <div className="grid grid-cols-[22%_78%] m-20">
+        <div>
+          <LeftSidebar />
+        </div>
+        <div>
+          <Outlet />
+        </div>
       </div>
-      
-      <div>
-        <Outlet />
-      </div>
-    </div>
+    </>
   );
 };
 
