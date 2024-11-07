@@ -76,7 +76,7 @@ function SignUpAndLogin() {
       );
       
       if (res.data.success) {
-        dispatch(setAuthUser(res.data.user));
+         dispatch(setAuthUser(res.data.user));
         toast.success(res.data.message);
         setTimeout(() => {
           navigate("/");

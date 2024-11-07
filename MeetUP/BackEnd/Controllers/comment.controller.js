@@ -1,40 +1,66 @@
-//import Sharp from "sharp";
+
 import Post from "../Models/post.model.js";
-//import User from "../Models/user.model.js";
-//import cloudinary from "../Utils/cloudinary.js";
 import Comment from "../Models/comment.model.js";
 
-//Add Comment Logic
 export const addComment = async (req, res) => {
   try {
     const postId = req.params.id;
-    const commentBy = req.id;
-    const { content } = req.body;
-    const post = Post.findById(postId);
-    if (!post) {
-      return res
-        .status(404)
-        .json({ message: "Post not found", success: false });
+    const commentBy = req.id;  // Ensure the author is correctly extracted from req.id
+    console.log("Author ID:", commentBy);  // Debugging log
+
+    const { content } = req.body;  // Get comment content
+
+    // Validate input
+    if (!content || content.trim() === "") {
+      return res.status(400).json({ message: "Comment content is required", success: false });
     }
-    const newComment = await Comment.create({
+
+    // Find the post by ID
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found", success: false });
+    }
+
+    // Create the new comment
+    const comment = await Comment.create({
       text: content,
-      author: commentBy,
+      author: commentBy,  // The author is linked to the logged-in user
       post: postId,
-    }).populate({
-      path: "author",
-      select: "username,avatar",
     });
-    await post.comments.push(newComment._id);
+
+    console.log("Comment Created:", comment);  // Log the created comment object
+
+    // Now populate the author field
+    const populatedComment = await Comment.findById(comment._id)
+      .populate({
+        path: "author",  // Populating the 'author' field
+        select: "username avatar",  // We want only 'username' and 'avatar' fields
+      });
+
+    console.log("Populated Comment:", populatedComment);  // Log the populated comment
+
+    // Add the new comment to the post's comments array
+    post.comments.push(populatedComment._id);
     await post.save();
+
+    // Send back the populated comment response
     return res.status(200).json({
       message: "New Comment Added",
-      newComment,
+      comment: populatedComment,
       success: true,
     });
+
   } catch (error) {
-    console.log("Add Commite Error:", error);
+    console.error("Add Comment Error:", error);
+    return res.status(500).json({
+      message: "An error occurred while adding the comment.",
+      success: false,
+    });
   }
 };
+
+
+ 
 
 // Get Post All Comment logic
 export const allComments = async (req, res) => {
@@ -42,7 +68,7 @@ export const allComments = async (req, res) => {
     const postId = req.params.id;
     const comments = await Comment.find({ post: postId }).populate(
       "author",
-      "username,avatar"
+      "username avatar"
     );
     if (!comments) {
       return res

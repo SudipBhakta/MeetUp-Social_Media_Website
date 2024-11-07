@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 
 const commentSchema = new mongoose.Schema(
   {
-    text: { type: String, require: true },
+    text: { type: String, required: true },  // corrected 'require' to 'required'
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      require: true,
+      required: true,  // corrected 'require' to 'required'
     },
-    post: { type: mongoose.Schema.Types.ObjectId, ref: "Post", require: true },
+    post: { type: mongoose.Schema.Types.ObjectId, ref: "Post", required: true },  // corrected 'require' to 'required'
   },
   {
     timestamps: true,
@@ -17,3 +17,4 @@ const commentSchema = new mongoose.Schema(
 
 const Comment = mongoose.model("Comment", commentSchema);
 export default Comment;
+

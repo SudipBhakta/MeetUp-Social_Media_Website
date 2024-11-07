@@ -8,7 +8,7 @@ import {
   register,
   suggestedUsers,
 } from "../Controllers/user.controller.js";
-import { isAuthanticat } from "../middlewere/auth.middleware.js";
+import { isAuthenticat } from "../middlewere/auth.middleware.js";
 import { upload } from "../Middlewere/multer.middleware.js";
 
 const userRouter = express.Router();
@@ -16,11 +16,11 @@ const userRouter = express.Router();
 userRouter.route("/signup").post(register);
 userRouter.route("/login").post(login);
 userRouter.route("/logout").get(logout);
-userRouter.route("/profile/edit").post(isAuthanticat, upload.single("avatar"), editProfile);
-userRouter.route("/suggestedusers").get(isAuthanticat, suggestedUsers);
-userRouter.route("/profile/:id").get(isAuthanticat, getProfile);
-userRouter.route("/follow/:id").post(isAuthanticat, followAndUnllow);
-userRouter.route("/unfollow/:id").post(isAuthanticat, followAndUnllow);
+userRouter.route("/profile/edit").post(isAuthenticat, upload.single("avatar"), editProfile);
+userRouter.route("/suggestedusers").get(isAuthenticat, suggestedUsers);
+userRouter.route("/profile/:id").get(isAuthenticat, getProfile);
+userRouter.route("/follow/:id").post(isAuthenticat, followAndUnllow);
+userRouter.route("/unfollow/:id").post(isAuthenticat, followAndUnllow);
 
 
 export default userRouter;

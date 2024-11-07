@@ -61,14 +61,16 @@ export const newPost = async (req, res) => {
   }
 };
 
-
 // Get Posts
 export const allPosts = async (req, res) => {
   try {
     const allPost = await Post.find()
       .sort({ createdAt: -1 })
       .populate({ path: "author", select: "username avatar" }) // Use space instead of comma
-      .populate({ path: "comments", select: "username avatar" }); // Assuming comments have a similar structure
+      .populate({ path: "comments", populate: {
+        path: 'author',
+        select: 'username profilePicture'
+    } }); // Assuming comments have a similar structure
     
     // Check if there are no posts found
     if (allPost.length === 0) {
@@ -76,7 +78,7 @@ export const allPosts = async (req, res) => {
         message: "No posts found",
         success: false,
       });
-    }
+    } 
     
     return res.status(200).json({
       success: true,
@@ -90,7 +92,6 @@ export const allPosts = async (req, res) => {
     });
   }
 };
-
 
 // Get user posts
 export const userPosts = async (req, res) => {
@@ -114,36 +115,82 @@ export const userPosts = async (req, res) => {
   }
 };
 
-// Like Unlike Logic
-export const likeAndUnlike = async (req, res) => {
-  const likedBy = req.id;
-  const postID = req.params.id;
+// Like a post
+export const likePost = async (req, res) => {
+  const likedBy = req.id; // User who is liking the post
+  const postID = req.params.id; // The post to be liked
   const likedPost = await Post.findById(postID);
 
   try {
-    if (!likedPost || !likedBy) {
+    if (!likedPost) {
       return res.status(404).json({
-        message: "Post Not Find",
+        message: "Post Not Found",
         success: false,
       });
     }
+
+    // Add user to the "likes" array if not already present
     if (likedPost.likes.includes(likedBy)) {
-      await likedPost.updateOne({ $pull: { likes: likedBy } });
       return res.status(400).json({
-        message: "Unlike Successfully",
-        success: true,
+        message: "You have already liked this post",
+        success: false,
       });
     }
+
+    // Update the post to add the user to the likes array
     await likedPost.updateOne({ $addToSet: { likes: likedBy } });
 
     return res.status(200).json({
-      message: "Like Successfully",
+      message: "Post liked successfully",
       success: true,
     });
   } catch (error) {
-    console.log("Like Unlike Error", error);
+    console.log("Like Error:", error);
+    return res.status(500).json({
+      message: "Error liking post",
+      success: false,
+    });
   }
 };
+
+// Unlike a post
+export const unlikePost = async (req, res) => {
+  const likedBy = req.id; // User who is unliking the post
+  const postID = req.params.id; // The post to be unliked
+  const likedPost = await Post.findById(postID);
+
+  try {
+    if (!likedPost) {
+      return res.status(404).json({
+        message: "Post Not Found",
+        success: false,
+      });
+    }
+
+    // Check if the user has already liked the post
+    if (!likedPost.likes.includes(likedBy)) {
+      return res.status(400).json({
+        message: "You have not liked this post yet",
+        success: false,
+      });
+    }
+
+    // Remove user from the "likes" array
+    await likedPost.updateOne({ $pull: { likes: likedBy } });
+
+    return res.status(200).json({
+      message: "Post unliked successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.log("Unlike Error:", error);
+    return res.status(500).json({
+      message: "Error unliking post",
+      success: false,
+    });
+  }
+};
+
 
 // Edit Post Logic
 export const editPost = async (req, res) => {

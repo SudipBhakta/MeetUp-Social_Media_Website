@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PostCard from "./PostCard";
-import CreatPost from "./CreatPost";
+import CreatPostDialog from "./CreatPostDialog";
 import { useSelector } from "react-redux";
 import getAllPosts from "../hooks/getAllPosts";
 
@@ -26,8 +26,7 @@ const Feed = () => {
             </button>
           </div>
         </div>
-        <CreatPost />
-
+        <CreatPostDialog />
         {posts.map((post) => (
           <PostCard post={post} key={post._id} />
         ))}

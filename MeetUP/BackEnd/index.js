@@ -26,12 +26,12 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(urlencoded({ extended: true }));
 
-// CORS Options
 const corsOptions = {
-  origin: "http://localhost:5173", // Corrected to http
+  origin: "http://localhost:5173",
   credentials: true,
 };
 app.use(cors(corsOptions));
+
 
 // Define Routes
 app.use("/api/v1/user", userRouter);
