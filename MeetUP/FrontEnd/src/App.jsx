@@ -13,9 +13,12 @@ function App() {
         <Route path="/" element={<MainLayout/>}>
           <Route index element={<Home />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="/profile/:id" element={<Profile />} />
         </Route>
         <Route path="/login" element={<SignUpAndLogin />} />
         <Route path="/signup" element={<SignUpAndLogin />} />
+        
+
       </Routes>
       <Toaster />
     </>

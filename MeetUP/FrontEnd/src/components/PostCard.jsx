@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { setCurrentPost, setPosts } from "../redux/postSlice";
 import CommentDialog from "./CommentDialog";
+import { Link } from "react-router-dom";
 
 const Post = ({ post }) => {
   const { user } = useSelector((store) => store.auth);
@@ -82,29 +83,38 @@ const Post = ({ post }) => {
 
   return (
     <>
-      <div className="bg-base-100 w-[78%] h-auto mr-2 mb-3 border-2 rounded-lg">
-        <div className="m-3 bg-base-100">
-          <div className="h-16 w-full flex relative">
-            <div className="avatar flex items-center">
-              <div className="w-10 h-10 ring-2 border-blue-700 rounded-full">
-                <img
-                  src={
-                    post.author.avatar ||
-                    "https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg?uid=R112247829&ga=GA1.1.1463034516.1727452914&semt=ais_siglip"
-                  }
-                  alt={post.author.username}
-                />
+      <div className="bg-base-100 w-[95%] h-auto mr-2 mb-3 border-2 rounded-lg">
+        <div className="mx-3 my-1 bg-base-100">
+          <div className="h-16 w-full items-center flex relative">
+            <Link to={`/profile/${post?.author._id}`}>
+              <div className="avatar flex ">
+                <div className="w-8 h-8 ring-2 ring-blue-700 rounded-full">
+                  <img
+                    src={
+                      post.author.avatar ||
+                      "https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg?uid=R112247829&ga=GA1.1.1463034516.1727452914&semt=ais_siglip"
+                    }
+                  />
+                </div>
               </div>
-              <h2 className="text-2xl font-semibold underline ml-4">
+            </Link>
+            <Link to={`/profile/${post?.author._id}`}>
+              <h2 className="text-xl font-semibold  ml-4">
                 {post.author.username}
               </h2>
-            </div>
+            </Link>
+
+            {user?._id === post.author._id && (
+              <div className="badge bg-blue-500  text-white text-xs ml-2 ">
+                Author
+              </div>
+            )}
             <MoreHorizontal
               className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer"
               onClick={() => document.getElementById("my_modal_1").showModal()}
             />
           </div>
-          {post.caption && <p className="mt-3 mb-2">{post.caption}</p>}
+          {post.caption && <p className="my-1">{post.caption}</p>}
           <div className="w-full h-80 flex items-center justify-center bg-transparent rounded-l-sm">
             <img
               src={post.image}

@@ -5,11 +5,13 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { MoreHorizontal } from "lucide-react";
 import Comment from "./Comment";
+import { setPosts } from "../redux/postSlice";
 
 const CommentDialog = ({ closeModal }) => {
-  const { currentPost } = useSelector((store) => store.posts);
+  const { currentPost, posts } = useSelector((store) => store.posts);
   const [text, setText] = useState("");
-  const [comments, setComments] = useState(currentPost?.comments || []); // To manage comments state locally
+  const [comment, setComment] = useState(currentPost?.comments || []);
+  const dispatch = useDispatch()
 
   const commentHandler = (e) => {
     const inputText = e.target.value;
@@ -20,17 +22,20 @@ const CommentDialog = ({ closeModal }) => {
     if (!currentPost || !text.trim()) {
       return;
     }
-
     try {
       const res = await axios.post(
         `http://localhost:4000/api/v1/post/${currentPost._id}/addcomment`,
         { content: text },
         { withCredentials: true }
       );
-
       if (res.data.success) {
         setText("");
-        setComments([...comments, res.data.comment]); // Add the new comment to the list
+        const updatedComment = [ res.data.comment, ...comment];
+        setComment(updatedComment);
+
+      const updatedPostComment = posts.map((singlePost)=>
+      singlePost._id === currentPost._id? {...singlePost, comments:updatedComment }:singlePost )
+      dispatch(setPosts(updatedPostComment))
         toast.success(res.data.message);
       }
     } catch (error) {
@@ -73,19 +78,19 @@ const CommentDialog = ({ closeModal }) => {
             <MoreHorizontal onClick={() => document.getElementById("my_modal_1").showModal()} />
           </div>
           <hr />
-          <div className="flex-1 overflow-y-auto max-h-96 p-4">
-            {comments.map((comment) => (
+          <div className="flex-1 overflow-y-auto max-h-96 ">
+            {comment.map((comment) => (
               <Comment key={comment._id} comment={comment} />
             ))}
           </div>
-          <div className="p-4">
+          <div className="p-2">
             <div className="flex">
               <input
                 type="text"
                 onChange={commentHandler}
                 value={text}
                 placeholder="Add a comment..."
-                className="w-full p-2 bg-transparent border-b-2 focus:outline-none"
+                className="w-full text-sm  bg-transparent border-b-2 focus:outline-none"
               />
               <button
                 className="px-2 h-6 mt-4 w-16 ml-3 font-bold text-sm text-white rounded-md bg-blue-500 hover:bg-blue-700"

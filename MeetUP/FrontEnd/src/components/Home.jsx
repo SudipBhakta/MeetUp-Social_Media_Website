@@ -2,16 +2,20 @@ import React from "react";
 import Feed from "./Feed";
 import { Outlet } from "react-router-dom";
 import RightSidebar from "./RightSidebar";
+import getSuggestedUser from "../hooks/getSuggestedUser";
 
 const Home = () => {
+  getSuggestedUser();
   return (
     <>
-      <div className="grid grid-cols-[75%_25%] max-h-full ">
+      <div className="grid grid-cols-[70%_30%] max-h-full ">
         <div className="">
           <Feed />
-          <Outlet/>
+          <Outlet />
         </div>
-        <RightSidebar/>
+        <div>
+          <RightSidebar />
+        </div>
       </div>
     </>
   );

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Comment = ({ comment }) => {
   return (
-    <div className="my-3 p-3 bg-gray-50 rounded-lg shadow-sm hover:bg-gray-100">
+    <div className="my-3 p-2 bg-gray-50 rounded-lg shadow-sm hover:bg-gray-100">
       <div className="flex items-start space-x-4">
         <Link  className="flex-shrink-0">
           <div className="w-8 h-8 rounded-full ring-2 ring-blue-700 overflow-hidden">
@@ -14,12 +14,12 @@ const Comment = ({ comment }) => {
           </div>
         </Link>
         {/* Comment Content Section */}
-        <div className="ml-4 flex flex-col">
-          <div className="flex items-center justify-between">
+        <div className="ml-4 flex  flex-col">
+          <div className="flex items-center  ">
             <Link >
               <h1 className="text-md font-semibold text-black">{comment?.author?.username}</h1>
             </Link>
-            <span className="text-xs ml-2 text-gray-400">
+            <span className="text-xs text-left ml-2 text-gray-400 ">
               {new Date(comment.createdAt).toLocaleDateString()} {/* Display comment timestamp */}
             </span>
           </div>
