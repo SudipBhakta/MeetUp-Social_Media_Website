@@ -183,8 +183,8 @@ export const editProfile = async (req, res) => {
 //Suggested User logic
 export const suggestedUsers = async (req, res) => {
   try {
-    const user = await User.find({ _id: { $ne: req.id } }).select("-password");
-    if (!user) {
+    const suggestedUser = await User.find({ _id: { $ne: req.id } }).select("-password");
+    if (!suggestedUser) {
       return res.status(404).json({
         message: "No Suggested User Found",
         success: false,
@@ -192,7 +192,7 @@ export const suggestedUsers = async (req, res) => {
     }
     return res.status(200).json({
       success: true,
-      user,
+      users:suggestedUser,
     });
   } catch (error) {
     console.log("SuggestedUser Error:", error);

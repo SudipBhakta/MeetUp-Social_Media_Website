@@ -1,55 +1,46 @@
-
 import Post from "../Models/post.model.js";
 import Comment from "../Models/comment.model.js";
 
 export const addComment = async (req, res) => {
   try {
     const postId = req.params.id;
-    const commentBy = req.id;  // Ensure the author is correctly extracted from req.id
-    console.log("Author ID:", commentBy);  // Debugging log
-
-    const { content } = req.body;  // Get comment content
+    const commentBy = req.id;
+    const { content } = req.body;
 
     // Validate input
     if (!content || content.trim() === "") {
-      return res.status(400).json({ message: "Comment content is required", success: false });
+      return res
+        .status(400)
+        .json({ message: "Comment content is required", success: false });
     }
 
     // Find the post by ID
     const post = await Post.findById(postId);
     if (!post) {
-      return res.status(404).json({ message: "Post not found", success: false });
+      return res
+        .status(404)
+        .json({ message: "Post not found", success: false });
     }
 
     // Create the new comment
     const comment = await Comment.create({
       text: content,
-      author: commentBy,  // The author is linked to the logged-in user
+      author: commentBy,
       post: postId,
     });
 
-    console.log("Comment Created:", comment);  // Log the created comment object
-
     // Now populate the author field
-    const populatedComment = await Comment.findById(comment._id)
-      .populate({
-        path: "author",  // Populating the 'author' field
-        select: "username avatar",  // We want only 'username' and 'avatar' fields
-      });
-
-    console.log("Populated Comment:", populatedComment);  // Log the populated comment
-
-    // Add the new comment to the post's comments array
+    const populatedComment = await Comment.findById(comment._id).populate({
+      path: "author",
+      select: "username avatar",
+    });
     post.comments.push(populatedComment._id);
     await post.save();
-
-    // Send back the populated comment response
     return res.status(200).json({
       message: "New Comment Added",
       comment: populatedComment,
       success: true,
     });
-
   } catch (error) {
     console.error("Add Comment Error:", error);
     return res.status(500).json({
@@ -58,9 +49,6 @@ export const addComment = async (req, res) => {
     });
   }
 };
-
-
- 
 
 // Get Post All Comment logic
 export const allComments = async (req, res) => {
