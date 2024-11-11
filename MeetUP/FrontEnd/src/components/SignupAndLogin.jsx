@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setAuthUser } from "../redux/authSlice.js";
+import getAllPosts from "../hooks/getAllPosts.jsx";
 
 function SignUpAndLogin() {
   const [isLogin, setIsLogin] = useState(true);
@@ -74,13 +75,12 @@ function SignUpAndLogin() {
           withCredentials: true,
         }
       );
-      
+
       if (res.data.success) {
-         dispatch(setAuthUser(res.data.user));
+        dispatch(setAuthUser(res.data.user));
         toast.success(res.data.message);
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        navigate("/");
+        getAllPosts();
       }
     } catch (error) {
       toast.error(error.response.data.message);

@@ -11,12 +11,14 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { setCurrentPost, setPosts } from "../redux/postSlice";
 import CommentDialog from "./CommentDialog";
+import PostMoreDialog from "./PostMoreDialog";
 import { Link } from "react-router-dom";
 
 const Post = ({ post }) => {
   const { user } = useSelector((store) => store.auth);
   const { posts } = useSelector((store) => store.posts);
   const [likes, setLikes] = useState(post.likes.length);
+  const comments = post.comments.length;
   const [isLiked, setIsLiked] = useState(
     post.likes.includes(user._id) || false
   );
@@ -27,7 +29,7 @@ const Post = ({ post }) => {
     try {
       const action = isLiked ? "unlike" : "like";
       const res = await axios.post(
-        `http://localhost:4000/api/v1/post/${post._id}/${action}`,
+        `http://localhost:4000/api/v1/post/${post?._id}/${action}`,
         {},
         { withCredentials: true }
       );
@@ -35,13 +37,13 @@ const Post = ({ post }) => {
         const updateLike = isLiked ? likes - 1 : likes + 1;
         setLikes(updateLike);
         setIsLiked(!isLiked);
-        const updatedPostlikes = posts.map((singlePost) =>
-          singlePost._id === post._id
+        const updatedPostlikes = posts?.map((singlePost) =>
+          singlePost?._id === post?._id
             ? {
                 ...singlePost,
                 likes: isLiked
-                  ? singlePost.likes.filter((id) => id !== user._id)
-                  : [...singlePost.likes, user._id],
+                  ? singlePost?.likes?.filter((id) => id !== user?._id)
+                  : [...singlePost.likes, user?._id],
               }
             : singlePost
         );
@@ -51,31 +53,11 @@ const Post = ({ post }) => {
       toast.error(error.response.data.message);
     }
   };
-
-  const deletePostHandler = async () => {
-    try {
-      const res = await axios.post(
-        `http://localhost:4000/api/v1/post/${post?._id}/deletepost`,
-        {},
-        { withCredentials: true }
-      );
-      if (res.data.success) {
-        const updatedPost = posts.filter(
-          (postItem) => postItem._id !== post?._id
-        );
-        closeCommentDialog;
-        dispatch(setPosts(updatedPost));
-        toast.success(res.data.message);
-      }
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
-  };
-
   const openCommentDialog = () => {
     dispatch(setCurrentPost(post));
     setIsCommentModalOpen(true);
   };
+  
 
   const closeCommentDialog = () => {
     setIsCommentModalOpen(false);
@@ -86,52 +68,68 @@ const Post = ({ post }) => {
       <div className="bg-base-100 w-[95%] h-auto mr-2 mb-3 border-2 rounded-lg">
         <div className="mx-3 my-1 bg-base-100">
           <div className="h-16 w-full items-center flex relative">
-            <Link to={`/profile/${post?.author._id}`}>
+            <Link to={`/profile/${post?.author?._id}`}>
               <div className="avatar flex ">
                 <div className="w-8 h-8 ring-2 ring-blue-700 rounded-full">
                   <img
                     src={
-                      post.author.avatar ||
+                      post?.author?.avatar ||
                       "https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg?uid=R112247829&ga=GA1.1.1463034516.1727452914&semt=ais_siglip"
                     }
                   />
                 </div>
               </div>
             </Link>
-            <Link to={`/profile/${post?.author._id}`}>
+            <Link to={`/profile/${post?.author?._id}`}>
               <h2 className="text-xl font-semibold  ml-4">
-                {post.author.username}
+                {post?.author?.username}
               </h2>
             </Link>
 
-            {user?._id === post.author._id && (
+            {user?._id === post?.author?._id && (
               <div className="badge bg-blue-500  text-white text-xs ml-2 ">
                 Author
               </div>
             )}
             <MoreHorizontal
               className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer"
-              onClick={() => document.getElementById("my_modal_1").showModal()}
+              onClick={() => {
+                dispatch(setCurrentPost(post));
+                document.getElementById("my_modal_1").showModal();
+              }}
             />
           </div>
-          {post.caption && <p className="my-1">{post.caption}</p>}
+          {post?.caption && <p className="my-1">{post?.caption}</p>}
           <div className="w-full h-80 flex items-center justify-center bg-transparent rounded-l-sm">
             <img
-              src={post.image}
+              src={post?.image}
               alt="Post Image"
               className="max-w-full max-h-full object-contain"
             />
           </div>
-          <div>
-            {likes ? (
-              <div className="flex gap-2 px-3 pt-2 pb-1">
-                <h3 className="font-semibold">React</h3>
-                <span>{likes}</span>
-              </div>
-            ) : (
-              <div className="flex gap-2 px-3 pt-2 pb-1"></div>
-            )}
+          <div className="flex justify-between">
+            <div>
+              {likes ? (
+                <div className="flex gap-2 px-3 pt-2 pb-1">
+                  <h3 className="font-semibold">React</h3>
+                  <span>{likes}</span>
+                </div>
+              ) : (
+                <div className="flex gap-2 px-3 pt-2 pb-1"></div>
+              )}
+            </div>
+            <div>
+              {comments ? (
+                <div className="flex gap-2 px-3 pt-2 pb-1">
+                  <h3 className="font-semibold">Comments</h3>
+                  <span>{comments}</span>
+                </div>
+              ) : (
+                <div className="flex gap-2 px-3 pt-2 pb-1"></div>
+              )}
+            </div>
           </div>
+
           <div className="flex justify-between px-3 pt-2 border-t">
             <button
               onClick={likeUnlikeHandler}
@@ -146,7 +144,7 @@ const Post = ({ post }) => {
             </button>
             <button
               className="flex h-10 hover:bg-blue-50 hover:text-blue-600 rounded-md items-center p-4 space-x-2"
-              onClick={openCommentDialog} // Open the comment dialog
+              onClick={openCommentDialog}
             >
               <MessageCircle />
               <h3 className="font-semibold">Comment</h3>
@@ -162,37 +160,15 @@ const Post = ({ post }) => {
           </div>
         </div>
       </div>
-
-      {/* Conditional rendering of the comment dialog */}
       {isCommentModalOpen && <CommentDialog closeModal={closeCommentDialog} />}
-
-      {/* Modal */}
-      <dialog id="my_modal_1" className="modal">
-        <div className="modal-box flex flex-col z-10 items-center w-[16%] rounded-md justify-between p-0 py-2">
-          <div className="p-2 cursor-pointer hover:bg-blue-600 w-full text-center">
-            unfollow
-          </div>
-          <div className="p-2 cursor-pointer hover:bg-blue-600 w-full text-center">
-            Add to Bookmark
-          </div>
-          {user && user?._id === post?.author._id && (
-            <>
-              <div className="p-2 cursor-pointer hover:bg-blue-600 w-full text-center">
-                edit
-              </div>
-              <div
-                className="p-2 cursor-pointer hover:bg-blue-600 w-full text-center"
-                onClick={deletePostHandler}
-              >
-                delete
-              </div>
-            </>
-          )}
-        </div>
-        <form method="dialog" className="modal-backdrop">
-          <button></button>
-        </form>
-      </dialog>
+      <PostMoreDialog
+        id="my_modal_1"
+        className="modal"
+        isOpen={true}
+        onRequestClose={() =>
+          document.getElementById("my_modal_1").closeModal()
+        }
+      />
     </>
   );
 };

@@ -276,7 +276,7 @@ export const deletePost = async (req, res) => {
     await Comment.deleteMany({ post: post._id });
 
     // Delete the post from the database
-    await Post.findByIdAndDelete(post._id); // Use findByIdAndDelete instead of post.delete()
+    await Post.findByIdAndDelete(post._id);
     return res
       .status(200)
       .json({ message: "Post deleted successfully", success: true });

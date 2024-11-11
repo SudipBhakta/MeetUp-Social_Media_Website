@@ -23,7 +23,7 @@ const SuggestedUser = () => {
           users.map((user) => (
             <div key={user._id} className="flex items-center relative m-2 p-2  rounded-md border-2 ">
               <Link to={`/profile/${user?._id}`}>
-                {" "}
+                
                 <div className="avatar ">
                   <div className=" w-12 h-12 ring-2 ring-blue-700 rounded-full">
                     <img
@@ -37,7 +37,8 @@ const SuggestedUser = () => {
                 </div>
               </Link>
               <div className="ml-3 w-full">
-                <h1 className="font-semibold">{user.username}</h1>
+              <Link to={`/profile/${user?._id}`}><h1 className="font-semibold">{user.username}</h1></Link>
+                
                 <p>{user.bio || ""}</p>
               </div>
               <button className="bg-blue-500 text-white px-4 py-1 hover:bg-blue-700 rounded-xl">Follow</button>

@@ -13,7 +13,12 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { setAuthUser } from "../redux/authSlice";
+import {
+  setAuthUser,
+  setSuggestedUsers,
+  setUserProfile,
+} from "../redux/authSlice";
+import { setCurrentPost, setPosts } from "../redux/postSlice";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -50,10 +55,12 @@ function Sidebar() {
       });
       if (res.data.success) {
         toast.success(res.data.message);
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
+        navigate("/login");
         dispatch(setAuthUser(null));
+        dispatch(setSuggestedUsers(null));
+        dispatch(setUserProfile(null));
+        dispatch(setPosts(null));
+        dispatch(setCurrentPost(null));
       }
     } catch (error) {
       toast.error(error.response.data.message);
@@ -64,9 +71,9 @@ function Sidebar() {
       logout();
     } else if (text === "Post") {
       document.getElementById("my_modal_4").showModal();
-    }else if(text === "Profile"){
+    } else if (text === "Profile") {
       navigate(`/profile/${user?._id}`);
-    }else if (text === "Home"){
+    } else if (text === "Home") {
       navigate("/");
     }
   };

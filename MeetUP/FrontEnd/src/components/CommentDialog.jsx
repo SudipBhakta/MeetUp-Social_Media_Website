@@ -24,7 +24,7 @@ const CommentDialog = ({ closeModal }) => {
     }
     try {
       const res = await axios.post(
-        `http://localhost:4000/api/v1/post/${currentPost._id}/addcomment`,
+        `http://localhost:4000/api/v1/post/${currentPost?._id}/addcomment`,
         { content: text },
         { withCredentials: true }
       );
@@ -33,8 +33,8 @@ const CommentDialog = ({ closeModal }) => {
         const updatedComment = [ res.data.comment, ...comment];
         setComment(updatedComment);
 
-      const updatedPostComment = posts.map((singlePost)=>
-      singlePost._id === currentPost._id? {...singlePost, comments:updatedComment }:singlePost )
+      const updatedPostComment = posts?.map((singlePost)=>
+      singlePost?._id === currentPost?._id? {...singlePost, comments:updatedComment }:singlePost )
       dispatch(setPosts(updatedPostComment))
         toast.success(res.data.message);
       }
@@ -52,7 +52,7 @@ const CommentDialog = ({ closeModal }) => {
       <div className="modal-box flex flex-1 rounded-sm max-w-5xl p-0 border h-[70%]">
         <div className="w-1/2 h-full flex items-center justify-center bg-slate-900 rounded-l-sm">
           <img
-            src={currentPost.image}
+            src={currentPost?.image}
             alt="Post Image"
             className="max-w-full max-h-full object-contain"
           />
@@ -64,23 +64,22 @@ const CommentDialog = ({ closeModal }) => {
                 <div className="w-9 rounded-full ring-2 ring-blue-700">
                   <img
                     src={
-                      currentPost.author.avatar ||
+                      currentPost?.author?.avatar ||
                       "https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg?uid=R112247829&ga=GA1.1.1463034516.1727452914&semt=ais_siglip"
                     }
-                    alt={currentPost.author.username}
                   />
                 </div>
               </Link>
               <Link>
-                <h2 className="card-title ml-4">{currentPost.author.username}</h2>
+                <h2 className="card-title ml-4">{currentPost?.author?.username}</h2>
               </Link>
             </div>
             <MoreHorizontal onClick={() => document.getElementById("my_modal_1").showModal()} />
           </div>
           <hr />
           <div className="flex-1 overflow-y-auto max-h-96 ">
-            {comment.map((comment) => (
-              <Comment key={comment._id} comment={comment} />
+            {comment?.map((comment) => (
+              <Comment key={comment?._id} comment={comment} />
             ))}
           </div>
           <div className="p-2">

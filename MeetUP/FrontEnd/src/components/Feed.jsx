@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import PostCard from "./PostCard";
-import CreatPostDialog from "./CreatPostDialog";
 import { useSelector } from "react-redux";
-import getAllPosts from "../hooks/getAllPosts";
 import { Link } from "react-router-dom";
 
 const Feed = () => {
-  getAllPosts();
+  
   const { user } = useSelector((store) => store.auth);
   const { posts } = useSelector((store) => store.posts);
   return (
@@ -36,8 +34,7 @@ const Feed = () => {
             </button>
           </div>
         </div>
-        <CreatPostDialog />
-        {posts.map((post) => (
+        {posts?.map((post) => (
           <PostCard post={post} key={post._id} />
         ))}
       </div>

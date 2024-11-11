@@ -5,6 +5,7 @@ import {  Route, Routes } from "react-router-dom";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
 import MainLayout from "./components/mainlayout/MainLayout";
+import EditProfile from "./components/EditProfile";
 
 function App() {
   return (
@@ -12,12 +13,11 @@ function App() {
      <Routes>
         <Route path="/" element={<MainLayout/>}>
           <Route index element={<Home />} />
-          <Route path="profile" element={<Profile />} />
           <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/editprofile" element={<EditProfile />} />
+
         </Route>
-        <Route path="/login" element={<SignUpAndLogin />} />
-        <Route path="/signup" element={<SignUpAndLogin />} />
-        
+        <Route path="/login" element={<SignUpAndLogin />} />        
 
       </Routes>
       <Toaster />

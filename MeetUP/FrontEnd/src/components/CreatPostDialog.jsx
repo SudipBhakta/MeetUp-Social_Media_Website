@@ -101,7 +101,12 @@ const CreatePost = () => {
                   ✕
                 </button>
                 <div className="w-10 ring-2 ring-blue-800 rounded-full">
-                  <img src={user?.avatar} alt="User avatar" />
+                  <img
+                    src={
+                      user?.avata ||
+                      "https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg?uid=R112247829&ga=GA1.1.1463034516.1727452914&semt=ais_siglip"
+                    }
+                  />
                 </div>
                 <h1 className="card-title ml-4 text-black underline font-semibold">
                   {user?.username}
