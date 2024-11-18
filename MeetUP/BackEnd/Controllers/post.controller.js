@@ -3,6 +3,7 @@ import Post from "../Models/post.model.js";
 import User from "../Models/user.model.js";
 import cloudinary from "../Utils/cloudinary.js";
 import Comment from "../Models/comment.model.js";
+import { getReceiverSocketID } from "../socket/soket.js";
 
 //Create New Post
 export const newPost = async (req, res) => {
@@ -139,6 +140,19 @@ export const likePost = async (req, res) => {
 
     // Update the post to add the user to the likes array
     await likedPost.updateOne({ $addToSet: { likes: likedBy } });
+    await likedPost.save();
+
+    const user = await User.findById(likedBy).select('usename avatar')
+    const postAuthor = likedPost.author.toString()
+    if(postAuthor !== likedBy){
+      const notification ={
+        usrId : likedBy,
+        userDetails:user,
+        message: `Your post was liked by ${user.username}`
+      }
+      const postAuthorSocketId= getReceiverSocketID(postAuthor)
+      io.to(postAuthorSocketId).emit("notification",notification)
+    }
 
     return res.status(200).json({
       message: "Post liked successfully",

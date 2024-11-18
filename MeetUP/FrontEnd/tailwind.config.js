@@ -5,5 +5,19 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [require("daisyui")],
+  plugins: [
+    require("daisyui"),
+    // Custom plugin to hide scrollbar
+    function ({ addUtilities }) {
+      addUtilities({
+        '.scrollbar-none': {
+          'scrollbar-width': 'none', /* Firefox */
+          '-ms-overflow-style': 'none', /* IE and Edge */
+        },
+        '.scrollbar-none::-webkit-scrollbar': {
+          display: 'none', /* Chrome, Safari, Opera */
+        },
+      }, ['responsive', 'hover']);
+    }
+  ],
 };

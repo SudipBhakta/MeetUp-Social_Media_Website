@@ -7,8 +7,10 @@ import CreatePost from "../CreatPostDialog";
 const MainLayout = () => {
   return (
     <>
-    <Navbar/>
-      <div className="grid grid-cols-[22%_78%] m-20">
+      <div>
+        <Navbar />
+      </div>
+      <div className="grid grid-cols-[22%_78%]  p-2 mx-20">
         <div>
           <LeftSidebar />
         </div>

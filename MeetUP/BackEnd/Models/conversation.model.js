@@ -7,9 +7,10 @@ const conversationSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
-  masseges: [
+  messages: [
     {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
     },
   ],
 });

@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { setAuthUser } from "../redux/authSlice";
 
 const EditProfile = () => {
   const { user } = useSelector((store) => store.auth);
@@ -14,14 +15,14 @@ const EditProfile = () => {
     bio: user?.bio,
     gender: user?.gender,
   });
-const [imagePreview, setImagePreview] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const fileChangeHandler = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-     setFormData({...formData, avatar:file})
+      setFormData({ ...formData, avatar: file });
       setImagePreview(URL.createObjectURL(file));
     }
   };
@@ -59,13 +60,16 @@ const [imagePreview, setImagePreview] = useState(null)
         }
       );
       if (res.data.success) {
+        const updatedUser = {
+          ...user,
+          avatar: res.data.user.avatar,
+          username: res.data.user.username,
+          bio: res.data.user.bio,
+          gender: res.data.user.gender,
+        };
+        dispatch(setAuthUser(updatedUser));
         toast.success("Profile updated successfully");
-        setFormData({
-          avatar: "",
-          username: "",
-          bio: "",
-          gender: "",
-        })
+        navigate(`/profile/${user?._id}`);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "An error occurred.");
@@ -79,7 +83,7 @@ const [imagePreview, setImagePreview] = useState(null)
       <div className="ml-10">
         <h1 className="font-bold  text-2xl">Edit Profile</h1>
         <div className="flex flex-col m-2 space-y-2 w-full p-4 h-[20%] justify-center rounded-md items-center">
-          <div className="flex gap-20">
+          <div className="flex gap-20 mb-6">
             <div className="avatar">
               <div className="w-36 h-36 ring-2 ring-blue-700 rounded-full">
                 <img
@@ -106,12 +110,15 @@ const [imagePreview, setImagePreview] = useState(null)
               Change Photo
             </button>
           </div>
-          <div className="w-[60%]">
+          <div className="w-[60%] ">
             <label className="block text-gray-700 text-sm font-medium mb-1">
-              User Name<span className="text-xs ml-2 text-red-400">*(Must be unique)</span>
+              User Name
+              <span className="text-xs ml-2 text-red-400">
+                *(Must be unique)
+              </span>
             </label>
             <textarea
-            value={formData.username}
+              value={formData.username}
               onChange={nameChangeHandler}
               placeholder={user?.username || "User Name"}
               className="w-full h-12 border-none ring-1 p-2 max-h-full font-semibold text-xl focus:outline-none block resize-none rounded-md"

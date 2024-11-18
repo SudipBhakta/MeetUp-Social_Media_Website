@@ -75,6 +75,8 @@ function Sidebar() {
       navigate(`/profile/${user?._id}`);
     } else if (text === "Home") {
       navigate("/");
+    }else if(text === "Message"){
+      navigate("/message")
     }
   };
   return (
